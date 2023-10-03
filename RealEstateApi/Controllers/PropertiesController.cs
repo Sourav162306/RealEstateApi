@@ -34,9 +34,9 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        [HttpGet("PropertyDetail")]
+        [HttpGet("[action]/{id}")]
         [Authorize]
-        public IActionResult GetPropertyDetail(int id)
+        public IActionResult PropertyDetail(int id)
         {
             var propertiesResult = _dbContext.Properties.FirstOrDefault(c => c.Id == id);
             if (propertiesResult == null)
@@ -79,9 +79,9 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize]
-        public IActionResult Post([FromBody] Property property)
+        public IActionResult Add([FromBody] Property property)
         {
             if (property == null)
             {
@@ -106,9 +106,9 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("[action]/{id}")]
         [Authorize]
-        public IActionResult Put(int id, [FromBody] Property property)
+        public IActionResult Edit(int id, [FromBody] Property property)
         {
             var propertyResult = _dbContext.Properties.FirstOrDefault(i => i.Id == id);
 
@@ -149,7 +149,7 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("[action]/{id}")]
         [Authorize]
         public IActionResult Delete(int id)
         {

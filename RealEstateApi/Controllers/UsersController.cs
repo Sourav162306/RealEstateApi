@@ -24,6 +24,27 @@ namespace RealEstateApi.Controllers
             _config = config;
         }
 
+        [HttpGet("Email")]
+        public IActionResult GetUser(string email)
+        {
+            var userResult = _dbContext.Users.FirstOrDefault(c => c.Email == email);
+            if (userResult == null)
+            {
+                return NotFound("User Not Found! Please Provide Correct Email");
+            }
+            else
+            {
+                return Ok(userResult);
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Get()
+        {
+            return Ok(_dbContext.Users);
+        }
+
         [HttpPost("[action]")]
         public IActionResult Register([FromBody] User user)
         {
@@ -36,7 +57,7 @@ namespace RealEstateApi.Controllers
 
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
-            return StatusCode(StatusCodes.Status201Created);
+            return StatusCode(StatusCodes.Status201Created, "User Created");
         }
 
         [HttpPost("[action]")]
@@ -46,24 +67,34 @@ namespace RealEstateApi.Controllers
 
             if (currentUser == null)
             {
-                return NotFound("User Doesn't Exist");
+                return NotFound("User With This Email Doesn't Exist");
             }
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            else
             {
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-            var token = new JwtSecurityToken(
-                issuer: _config["JWT:Issuer"],
-                audience: _config["JWT:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(600),
-                signingCredentials: credentials
-            );
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return Ok(jwt);
+                if(currentUser.Password == user.Password)
+                {
+                    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
+                    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                    var claims = new[]
+                        {
+                            new Claim(ClaimTypes.Email, user.Email)
+                        };
+                    var token = new JwtSecurityToken(
+                        issuer: _config["JWT:Issuer"],
+                        audience: _config["JWT:Audience"],
+                        claims: claims,
+                        expires: DateTime.Now.AddMinutes(600),
+                        signingCredentials: credentials
+                    );
+                    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+                    return Ok(jwt);
+                }
+                else
+                {
+                    return BadRequest("Password Incorrect");
+                }
+            }
+            
         }
     }
 }
