@@ -42,9 +42,9 @@ namespace RealEstateApi.Controllers
 
         [HttpGet("SearchCategories")]
         [Authorize]
-        public IActionResult GetSearchProperties(string category)
+        public IActionResult GetSearchProperties(string name)
         {
-            var propertiesResult = _dbContext.Categories.Include("Properties").Where(c => c.Name.Contains(category));
+            var propertiesResult = _dbContext.Categories.Include("Properties").Where(c => c.Name.Contains(name));
             if (propertiesResult == null)
             {
                 return NotFound();

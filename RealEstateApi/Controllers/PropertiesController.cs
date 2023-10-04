@@ -34,6 +34,13 @@ namespace RealEstateApi.Controllers
             }
         }
 
+        [HttpGet("AllPropertyList")]
+        [Authorize]
+        public IActionResult GetProperties()
+        {
+            return Ok(_dbContext.Properties);
+        }
+
         [HttpGet("[action]/{id}")]
         [Authorize]
         public IActionResult PropertyDetail(int id)
@@ -97,11 +104,10 @@ namespace RealEstateApi.Controllers
                 }
                 else
                 {
-                    property.IsTrending = false;
                     property.UserId = user.Id;
                     _dbContext.Properties.Add(property);
                     _dbContext.SaveChanges();
-                    return StatusCode(StatusCodes.Status201Created);
+                    return StatusCode(StatusCodes.Status201Created, "Property Added");
                 }
             }
         }
@@ -134,15 +140,14 @@ namespace RealEstateApi.Controllers
                         propertyResult.Price = property.Price;
                         propertyResult.ImageUrl = property.ImageUrl;
                         propertyResult.CategoryId = property.CategoryId;
-                        propertyResult.IsTrending = false;
-                        propertyResult.UserId = user.Id;
+                        propertyResult.IsTrending = property.IsTrending;
 
                         _dbContext.SaveChanges();
                         return Ok("Record Updated Successfully");
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest("You Are Not Authorize To Update This Property, Please Provide Valid Token");
                     }
               
                 }
@@ -177,7 +182,7 @@ namespace RealEstateApi.Controllers
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest("You Are Not Authorize To Delete This Property, Please Provide Valid Token");
                     }
 
                 }

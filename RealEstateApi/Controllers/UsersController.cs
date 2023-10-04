@@ -83,7 +83,7 @@ namespace RealEstateApi.Controllers
                         issuer: _config["JWT:Issuer"],
                         audience: _config["JWT:Audience"],
                         claims: claims,
-                        expires: DateTime.Now.AddMinutes(600),
+                        expires: DateTime.Now.AddMinutes(60),
                         signingCredentials: credentials
                     );
                     var jwt = new JwtSecurityTokenHandler().WriteToken(token);
